@@ -7,7 +7,6 @@ import {
   Building2, 
   ChevronRight, 
   ExternalLink,
-  Edit,
   Save,
   CheckCircle,
   FileText
@@ -161,33 +160,6 @@ export function AcademicPrograms() {
                 ></textarea>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <label className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                    <Edit className="w-4 h-4 text-blue-500" />
-                    Quick Actions
-                  </label>
-                  <div className="grid grid-cols-1 gap-3">
-                    <button className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl hover:border-blue-500 transition-colors shadow-sm text-left group">
-                      <span className="text-sm font-bold text-gray-700">Update Curriculum PDF</span>
-                      <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-500" />
-                    </button>
-                    <button className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl hover:border-blue-500 transition-colors shadow-sm text-left group">
-                      <span className="text-sm font-bold text-gray-700">Manage Faculty Members</span>
-                      <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-500" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="p-6 bg-[#0A192F] rounded-2xl text-white flex flex-col justify-center shadow-xl">
-                  <h4 className="text-sm font-bold mb-2 uppercase tracking-tight">Active Curriculum</h4>
-                  <p className="text-xs text-blue-100/60 font-medium mb-4">SY 2026-2027 v.2.4</p>
-                  <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 w-3/4 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
-                  </div>
-                  <span className="text-[10px] mt-2 font-bold text-blue-300/80 uppercase">75% Data Accuracy Score</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>

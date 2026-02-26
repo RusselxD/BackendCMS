@@ -1,17 +1,16 @@
 'use client'
 
 import React, { useState } from "react";
-import { 
-  Heart, 
-  Book, 
-  Shield, 
-  Settings, 
-  Plus, 
-  Trash2, 
-  MoveUp, 
-  MoveDown, 
+import {
+  Heart,
+  Book,
+  Shield,
+  Settings,
+  Plus,
+  Trash2,
+  MoveUp,
+  MoveDown,
   ChevronRight,
-  Info,
   Save,
   Grid
 } from "lucide-react";
@@ -88,7 +87,7 @@ export function StudentLife() {
                 {activeTab} Section Settings
               </h3>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-4">
                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest">Section Icon</label>
@@ -99,8 +98,8 @@ export function StudentLife() {
                       onClick={() => setSelectedIcon(item.id)}
                       className={clsx(
                         "aspect-square flex flex-col items-center justify-center rounded-xl border-2 transition-all group",
-                        selectedIcon === item.id 
-                          ? "border-blue-600 bg-blue-50 text-blue-600" 
+                        selectedIcon === item.id
+                          ? "border-blue-600 bg-blue-50 text-blue-600"
                           : "border-gray-100 bg-gray-50 text-gray-400 hover:border-gray-200"
                       )}
                     >
@@ -124,7 +123,7 @@ export function StudentLife() {
 
             <div>
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Section Intro</label>
-              <textarea 
+              <textarea
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]"
                 defaultValue={`This section covers the ${activeTab} requirements and processes for the Engineering Department students.`}
               ></textarea>
@@ -139,7 +138,7 @@ export function StudentLife() {
                   <ChevronRight className="w-5 h-5 text-blue-500" />
                   Process Workflow Steps
                 </h3>
-                <button 
+                <button
                   onClick={addStep}
                   className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold hover:bg-blue-100 transition-colors"
                 >
@@ -152,7 +151,7 @@ export function StudentLife() {
                 {ojtSteps.map((step, index) => (
                   <div key={step.id} className="flex gap-4 p-4 border border-gray-100 rounded-xl bg-gray-50/50 group">
                     <div className="flex flex-col items-center gap-2 text-gray-300">
-                      <button 
+                      <button
                         onClick={() => moveStep(index, "up")}
                         disabled={index === 0}
                         className="hover:text-blue-500 disabled:opacity-30"
@@ -162,7 +161,7 @@ export function StudentLife() {
                       <span className="text-sm font-bold text-blue-600 bg-blue-100 w-6 h-6 flex items-center justify-center rounded-full">
                         {index + 1}
                       </span>
-                      <button 
+                      <button
                         onClick={() => moveStep(index, "down")}
                         disabled={index === ojtSteps.length - 1}
                         className="hover:text-blue-500 disabled:opacity-30"
@@ -172,14 +171,14 @@ export function StudentLife() {
                     </div>
 
                     <div className="flex-1 space-y-3">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         defaultValue={step.title}
                         className="w-full bg-transparent border-none p-0 text-sm font-bold text-gray-900 focus:ring-0"
                         placeholder="Step Title"
                       />
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         defaultValue={step.description}
                         className="w-full bg-transparent border-none p-0 text-xs text-gray-500 font-medium focus:ring-0"
                         placeholder="Detailed description..."
@@ -187,7 +186,7 @@ export function StudentLife() {
                     </div>
 
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button 
+                      <button
                         onClick={() => removeStep(step.id)}
                         className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
@@ -203,26 +202,10 @@ export function StudentLife() {
 
         {/* Info & Help Sidebar */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-[#0A192F] rounded-2xl p-6 text-white shadow-xl">
-            <h4 className="font-bold flex items-center gap-2 mb-4">
-              <Info className="w-5 h-5 text-blue-400" />
-              Live Preview Tip
-            </h4>
-            <p className="text-sm text-blue-100/80 leading-relaxed font-medium">
-              Changes made here will update the "Student Life" landing page cards. The icons selected will appear in the circular badges on the frontend.
-            </p>
-            <div className="mt-6 p-4 bg-white/5 rounded-xl border border-white/10 flex items-center gap-4">
-              {React.createElement(ICON_OPTIONS.find(i => i.id === selectedIcon)?.icon || Heart, { className: "w-8 h-8 text-blue-400" })}
-              <div>
-                <span className="text-xs uppercase tracking-widest text-white/40 font-bold block">Selected Style</span>
-                <span className="font-bold">{activeTab} Section</span>
-              </div>
-            </div>
-          </div>
 
           <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4 shadow-sm">
             <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest border-b border-gray-100 pb-3">Actions</h4>
-            <button 
+            <button
               onClick={handleSave}
               className="w-full flex items-center justify-center gap-2 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
             >

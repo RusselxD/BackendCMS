@@ -1,7 +1,7 @@
 'use client'
 
-import { HeroSlider } from "../pages/HeroSlider";
+import { MediaCarousel } from "../pages/MediaCarousel";
 
 export default function CarouselPage() {
-  return <HeroSlider />;
+  return <MediaCarousel />;
 }

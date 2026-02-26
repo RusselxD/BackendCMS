@@ -7,9 +7,10 @@ import {
   LayoutDashboard, 
   Newspaper, 
   Megaphone,
-  GalleryHorizontal,
-  Plus,
-  UserCircle
+  Library,
+  Settings,
+  UserCircle,
+  CheckCircle2
 } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -25,34 +26,31 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     { name: "Dashboard", path: "/", icon: LayoutDashboard },
     { name: "News/Articles", path: "/news", icon: Newspaper },
     { name: "Announcements", path: "/announcements", icon: Megaphone },
-    { name: "Carousel", path: "/carousel", icon: GalleryHorizontal },
+    { name: "Media & Carousel", path: "/media", icon: Library },
+    { name: "System Settings", path: "/settings", icon: Settings },
+  ];
+
+  const adminItems = [
+    { name: "Article Approvals", path: "/approvals", icon: CheckCircle2 },
   ];
 
   const getPageInfo = () => {
-    const current = navItems.find(item => item.path === pathname);
+    const current = navItems.find(item => item.path === pathname) || adminItems.find(item => item.path === pathname);
     if (!current) {
-       if (pathname === "/student-life") return { name: "Student Life", action: "Add Section" };
-       if (pathname === "/programs") return { name: "Programs", action: "Add Program" };
-       return { name: "Dashboard", action: "New Report" };
+       if (pathname === "/student-life") return { name: "Student Life" };
+       if (pathname === "/programs") return { name: "Programs" };
+       return { name: "Dashboard" };
     }
-    
-    const actions: Record<string, string> = {
-      "/": "New Report",
-      "/news": "Create New Article",
-      "/announcements": "Post Announcement",
-      "/carousel": "Add Slide",
-    };
 
     return {
-      name: current.name,
-      action: actions[current.path] || "Global Action"
+      name: current.name
     };
   };
 
-  const { name: pageTitle, action: globalAction } = getPageInfo();
+  const { name: pageTitle } = getPageInfo();
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC]">
+    <div className="flex h-dvh min-h-dvh bg-[#F8FAFC]">
       {/* Fixed Sidebar (Navy Blue) */}
       <aside className="w-72 bg-[#0A192F] text-white flex flex-col shrink-0">
         <div className="p-8">
@@ -67,6 +65,26 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <div className="px-4 mb-4 text-[10px] font-black text-white/30 uppercase tracking-widest">Management</div>
           <ul className="space-y-1.5 px-3">
             {navItems.map((item) => (
+              <li key={item.path}>
+                <Link
+                  href={item.path}
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group",
+                    pathname === item.path
+                      ? "bg-white/10 text-white shadow-lg ring-1 ring-white/20" 
+                      : "text-white/50 hover:text-white hover:bg-white/5"
+                  )}
+                >
+                  <item.icon className={cn("w-5 h-5 transition-transform group-hover:scale-110", pathname === item.path ? "text-orange-500" : "")} />
+                  <span className="text-sm font-bold tracking-tight">{item.name}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          <div className="px-4 mt-8 mb-4 text-[10px] font-black text-white/30 uppercase tracking-widest">Admin Controls</div>
+          <ul className="space-y-1.5 px-3">
+            {adminItems.map((item) => (
               <li key={item.path}>
                 <Link
                   href={item.path}
@@ -102,7 +120,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* User Profile (Bottom-aligned) */}
-        <div className="p-6 mt-auto bg-black/20">
+        <div className="p-6 bg-black/20">
           <div className="flex items-center gap-4">
             <div className="relative">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-400 flex items-center justify-center border-2 border-white/10">
@@ -131,18 +149,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Connected to main server</span>
             </div>
           </div>
-          
-          <div className="flex items-center gap-4">
-             <div className="h-10 w-px bg-gray-100 mx-4"></div>
-             <button className="flex items-center gap-2 px-6 py-3 bg-[#0A192F] text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#112240] transition-all hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0">
-              <Plus className="w-4 h-4 text-orange-500" />
-              {globalAction}
-            </button>
-          </div>
         </header>
 
         {/* Scrollable Content Container (Light Gray Canvas) */}
-        <section className="flex-1 overflow-y-auto p-10 bg-[#F8FAFC]">
+        <section className="flex-1 overflow-y-auto p-8 bg-[#F8FAFC]">
           <div className="max-w-[1600px] mx-auto">
             {children}
           </div>

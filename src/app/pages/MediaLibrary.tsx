@@ -3,31 +3,30 @@
 import React, { useState } from "react";
 // @ts-ignore - Library doesn't have proper types
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import {
-  X,
-  Info,
-  CheckCircle2,
-  AlertCircle,
-  Search,
-  Filter,
+import { 
+  X, 
+  Info, 
+  CheckCircle2, 
+  AlertCircle, 
+  Search, 
+  Filter, 
   MoreVertical,
   Link2,
   Trash2,
   Download
 } from "lucide-react";
-
 import { clsx } from "clsx";
 
 function ExternalLinkIcon({ className }: { className?: string }) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="3" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
       className={className}
     >
       <path d="M15 3h6v6" /><path d="M10 14 21 3" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -56,9 +55,9 @@ export function MediaLibrary() {
         <div className="flex items-center justify-between mb-8">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search media assets..."
+            <input 
+              type="text" 
+              placeholder="Search media assets..." 
               className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition-all"
             />
           </div>
@@ -76,7 +75,7 @@ export function MediaLibrary() {
           {/* @ts-ignore - Library doesn't have proper types */}
           <Masonry gutter="20px">
             {MEDIA_DATA.map((image) => (
-              <div
+              <div 
                 key={image.id}
                 onClick={() => setSelectedImage(image)}
                 className={clsx(
@@ -84,14 +83,15 @@ export function MediaLibrary() {
                   selectedImage?.id === image.id ? "border-blue-500 shadow-xl" : "border-transparent"
                 )}
               >
-                <img
-                  src={image.url}
-                  alt={image.alt}
+                <img 
+                  src={image.url} 
+                  alt={image.alt} 
                   className="w-full object-cover h-auto"
+                  onError={(e) => (e.currentTarget.style.display = 'none')}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-4 flex flex-col justify-end">
-                  <p className="text-white text-xs font-bold truncate uppercase tracking-wider">{image.alt}</p>
-                  <p className="text-white/60 text-[10px] uppercase font-black">{image.format} • {image.size}</p>
+                   <p className="text-white text-xs font-bold truncate uppercase tracking-wider">{image.alt}</p>
+                   <p className="text-white/60 text-[10px] uppercase font-black">{image.format} • {image.size}</p>
                 </div>
               </div>
             ))}
@@ -100,7 +100,7 @@ export function MediaLibrary() {
       </div>
 
       {/* Sidebar Info Pane (Right Slide-out) */}
-      <aside
+      <aside 
         className={clsx(
           "fixed right-0 top-20 bottom-0 w-96 bg-white border-l border-slate-100 shadow-2xl transition-transform duration-300 z-20 flex flex-col",
           selectedImage ? "translate-x-0" : "translate-x-full"
@@ -113,7 +113,7 @@ export function MediaLibrary() {
                 <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">Asset Details</h3>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Properties & Usage</p>
               </div>
-              <button
+              <button 
                 onClick={() => setSelectedImage(null)}
                 className="p-2 hover:bg-slate-200/50 rounded-full transition-colors"
               >
@@ -124,7 +124,7 @@ export function MediaLibrary() {
             <div className="flex-1 overflow-y-auto p-8 space-y-8">
               {/* Preview */}
               <div className="aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
-                <img src={selectedImage.url} alt="Preview" className="w-full h-full object-cover" />
+                <img src={selectedImage.url} alt="Preview" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
               </div>
 
               {/* Alt Text Input */}
@@ -133,7 +133,7 @@ export function MediaLibrary() {
                   <Info className="w-3 h-3 text-blue-500" />
                   Alt Text (Accessibility)
                 </label>
-                <textarea
+                <textarea 
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none h-24"
                   defaultValue={selectedImage.alt}
                   placeholder="Describe the image content..."
@@ -179,13 +179,13 @@ export function MediaLibrary() {
 
             {/* Pane Actions */}
             <div className="p-6 border-t border-slate-50 bg-slate-50/30 flex gap-3 shrink-0">
-              <button className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">
-                <Download className="w-4 h-4" />
-                Download
-              </button>
-              <button className="p-3 bg-red-50 text-red-500 border border-red-100 rounded-xl hover:bg-red-100 transition-colors">
-                <Trash2 className="w-4 h-4" />
-              </button>
+               <button className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-100 text-slate-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">
+                 <Download className="w-4 h-4" />
+                 Download
+               </button>
+               <button className="p-3 bg-red-50 text-red-500 border border-red-100 rounded-xl hover:bg-red-100 transition-colors">
+                 <Trash2 className="w-4 h-4" />
+               </button>
             </div>
           </>
         )}
