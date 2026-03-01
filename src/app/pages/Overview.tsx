@@ -25,27 +25,27 @@ const data = [
 ];
 
 const StatCard = ({ title, value, change, trend, icon: Icon, color }: any) => (
-  <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+  <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
     <div className="flex justify-between items-start">
-      <div className={`p-2 rounded-lg ${color}`}>
-        <Icon className="w-5 h-5 text-white" />
+      <div className={`p-1.5 rounded-lg ${color}`}>
+        <Icon className="w-4 h-4 text-white" />
       </div>
-      <div className={`flex items-center gap-1 text-sm font-medium ${trend === "up" ? "text-green-600" : "text-red-600"}`}>
-        {trend === "up" ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+      <div className={`flex items-center gap-0.5 text-xs font-semibold ${trend === "up" ? "text-green-600" : "text-red-600"}`}>
+        {trend === "up" ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
         {change}
       </div>
     </div>
-    <div className="mt-4">
-      <h3 className="text-sm font-medium text-gray-500">{title}</h3>
-      <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+    <div className="mt-3">
+      <h3 className="text-xs font-medium text-gray-500">{title}</h3>
+      <p className="text-xl font-bold text-gray-900 mt-1">{value}</p>
     </div>
   </div>
 );
 
 export function Overview() {
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
           title="Total Page Views" 
           value="12,482" 
@@ -80,10 +80,10 @@ export function Overview() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-          <h3 className="text-base font-semibold text-gray-800 mb-6">Traffic Overview</h3>
-          <div className="h-80 w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
+          <h3 className="text-sm font-semibold text-gray-800 mb-4">Traffic Overview</h3>
+          <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data}>
                 <defs>
@@ -93,8 +93,8 @@ export function Overview() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: "#94a3b8", fontSize: 12}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: "#94a3b8", fontSize: 12}} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: "#94a3b8", fontSize: 11}} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: "#94a3b8", fontSize: 11}} />
                 <Tooltip />
                 <Area type="monotone" dataKey="views" stroke="#3b82f6" fillOpacity={1} fill="url(#colorViews)" />
               </AreaChart>
@@ -102,14 +102,14 @@ export function Overview() {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-          <h3 className="text-base font-semibold text-gray-800 mb-6">Post Frequency</h3>
-          <div className="h-80 w-full">
+        <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
+          <h3 className="text-sm font-semibold text-gray-800 mb-4">Post Frequency</h3>
+          <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: "#94a3b8", fontSize: 12}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: "#94a3b8", fontSize: 12}} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: "#94a3b8", fontSize: 11}} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: "#94a3b8", fontSize: 11}} />
                 <Tooltip />
                 <Bar dataKey="posts" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
               </BarChart>

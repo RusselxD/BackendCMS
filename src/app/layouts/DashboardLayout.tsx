@@ -5,12 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, 
-  Newspaper, 
-  Megaphone,
-  Library,
-  Settings,
   UserCircle,
-  CheckCircle2
+  CheckCircle2,
+  Settings,
+  Users,
+  BookOpen,
+  GraduationCap
 } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -24,21 +24,25 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   
   const navItems = [
     { name: "Dashboard", path: "/", icon: LayoutDashboard },
-    { name: "News/Articles", path: "/news", icon: Newspaper },
-    { name: "Announcements", path: "/announcements", icon: Megaphone },
-    { name: "Media & Carousel", path: "/media", icon: Library },
-    { name: "System Settings", path: "/settings", icon: Settings },
   ];
 
-  const adminItems = [
-    { name: "Article Approvals", path: "/approvals", icon: CheckCircle2 },
+  const contentItems = [
+    { name: "Home Settings", path: "/home-settings", icon: Settings },
+    { name: "Academics", path: "/academics-settings", icon: BookOpen },
+    { name: "Administrator", path: "/administrator-settings", icon: Users },
+    { name: "Curriculum", path: "/programs", icon: GraduationCap },
   ];
 
   const getPageInfo = () => {
-    const current = navItems.find(item => item.path === pathname) || adminItems.find(item => item.path === pathname);
+    const current =
+      navItems.find((item) => item.path === pathname) ||
+      contentItems.find((item) => item.path === pathname);
+
+    if (pathname === "/approvals") {
+      return { name: "Approval" };
+    }
+
     if (!current) {
-       if (pathname === "/student-life") return { name: "Student Life" };
-       if (pathname === "/programs") return { name: "Programs" };
        return { name: "Dashboard" };
     }
 
@@ -50,110 +54,115 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { name: pageTitle } = getPageInfo();
 
   return (
-    <div className="flex h-dvh min-h-dvh bg-[#F8FAFC]">
-      {/* Fixed Sidebar (Navy Blue) */}
-      <aside className="w-72 bg-[#0A192F] text-white flex flex-col shrink-0">
-        <div className="p-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center font-black text-white italic">E</div>
-            <h1 className="text-xl font-black tracking-tight uppercase">Command <span className="text-orange-500 text-sm">Center</span></h1>
+    <div className="flex h-dvh min-h-dvh bg-slate-100">
+      {/* Fixed Sidebar */}
+      <aside className="w-64 bg-slate-950 text-white flex flex-col shrink-0 border-r border-slate-800">
+        <div className="px-4 py-4 border-b border-slate-800">
+          <div className="flex items-center gap-2.5 mb-1">
+            <div className="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center font-semibold text-white text-sm">E</div>
+            <div>
+              <h1 className="text-base font-semibold tracking-tight text-slate-100">CEIT CMS</h1>
+              <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wide">Administration</p>
+            </div>
           </div>
-          <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">University Engineering</p>
+          <p className="text-xs text-slate-400 font-medium">University Engineering</p>
         </div>
         
-        <nav className="flex-1 py-4">
-          <div className="px-4 mb-4 text-[10px] font-black text-white/30 uppercase tracking-widest">Management</div>
-          <ul className="space-y-1.5 px-3">
+        <nav className="flex-1 py-3 overflow-y-auto">
+          <div className="px-4 mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-[0.12em]">Management</div>
+          <ul className="space-y-1 px-3">
             {navItems.map((item) => (
               <li key={item.path}>
                 <Link
                   href={item.path}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group",
+                    "group flex items-center gap-2.5 px-3 py-2 rounded-md transition-colors border",
                     pathname === item.path
-                      ? "bg-white/10 text-white shadow-lg ring-1 ring-white/20" 
-                      : "text-white/50 hover:text-white hover:bg-white/5"
+                      ? "bg-blue-600 text-white border-blue-500"
+                      : "text-slate-300 border-transparent hover:text-white hover:bg-slate-900 hover:border-slate-800"
                   )}
                 >
-                  <item.icon className={cn("w-5 h-5 transition-transform group-hover:scale-110", pathname === item.path ? "text-orange-500" : "")} />
-                  <span className="text-sm font-bold tracking-tight">{item.name}</span>
+                  <item.icon className="w-4 h-4 flex-shrink-0 text-slate-300 group-hover:text-white" />
+                  <span className="text-sm font-medium">{item.name}</span>
                 </Link>
               </li>
             ))}
           </ul>
 
-          <div className="px-4 mt-8 mb-4 text-[10px] font-black text-white/30 uppercase tracking-widest">Admin Controls</div>
-          <ul className="space-y-1.5 px-3">
-            {adminItems.map((item) => (
+          <div className="mx-4 h-px bg-slate-800 my-4" />
+
+          <div className="px-4 mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-[0.12em]">Content Management</div>
+          <ul className="space-y-1 px-3">
+            {contentItems.map((item) => (
               <li key={item.path}>
                 <Link
                   href={item.path}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group",
+                    "group flex items-center gap-2.5 px-3 py-2 rounded-md transition-colors border",
                     pathname === item.path
-                      ? "bg-white/10 text-white shadow-lg ring-1 ring-white/20" 
-                      : "text-white/50 hover:text-white hover:bg-white/5"
+                      ? "bg-blue-600 text-white border-blue-500"
+                      : "text-slate-300 border-transparent hover:text-white hover:bg-slate-900 hover:border-slate-800"
                   )}
                 >
-                  <item.icon className={cn("w-5 h-5 transition-transform group-hover:scale-110", pathname === item.path ? "text-orange-500" : "")} />
-                  <span className="text-sm font-bold tracking-tight">{item.name}</span>
+                  <item.icon className="w-4 h-4 flex-shrink-0 text-slate-300 group-hover:text-white" />
+                  <span className="text-sm font-medium">{item.name}</span>
                 </Link>
               </li>
             ))}
           </ul>
 
-          <div className="px-4 mt-8 mb-4 text-[10px] font-black text-white/30 uppercase tracking-widest">Student Portal</div>
-          <ul className="space-y-1.5 px-3">
-             <li>
-                <Link href="/student-life" className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-white/50 hover:text-white hover:bg-white/5 font-bold text-sm", pathname === "/student-life" && "bg-white/10 text-white")}>
-                  <span className="w-5 h-5 flex items-center justify-center text-[10px] border border-white/20 rounded">SL</span>
-                  Student Life
-                </Link>
-             </li>
-             <li>
-                <Link href="/programs" className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-white/50 hover:text-white hover:bg-white/5 font-bold text-sm", pathname === "/programs" && "bg-white/10 text-white")}>
-                  <span className="w-5 h-5 flex items-center justify-center text-[10px] border border-white/20 rounded">AP</span>
-                  Programs
-                </Link>
-             </li>
+          <div className="mx-4 h-px bg-slate-800 my-4" />
+
+          <div className="px-4 mb-2 text-[10px] font-semibold text-slate-500 uppercase tracking-[0.12em]">Admin Controls</div>
+          <ul className="space-y-1 px-3">
+            <li>
+              <Link
+                href="/approvals"
+                className={cn(
+                  "group flex items-center gap-2.5 px-3 py-2 rounded-md transition-colors border",
+                  pathname === "/approvals"
+                    ? "bg-blue-600 text-white border-blue-500"
+                    : "text-slate-300 border-transparent hover:text-white hover:bg-slate-900 hover:border-slate-800"
+                )}
+              >
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-slate-300 group-hover:text-white" />
+                <span className="text-sm font-medium">Approval</span>
+              </Link>
+            </li>
           </ul>
         </nav>
 
-        {/* User Profile (Bottom-aligned) */}
-        <div className="p-6 bg-black/20">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-400 flex items-center justify-center border-2 border-white/10">
-                <UserCircle className="w-8 h-8 text-white/80" />
-              </div>
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-4 border-[#0A192F] rounded-full"></div>
+        {/* User Profile */}
+        <div className="p-3 border-t border-slate-800 bg-slate-900">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center flex-shrink-0">
+              <span className="text-xs font-semibold text-slate-200">N</span>
             </div>
-            <div className="flex flex-col min-w-0">
-              <span className="text-sm font-black truncate">Dr. Elizabeth Grant</span>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[9px] px-1.5 py-0.5 bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded uppercase font-black">Super Admin</span>
-              </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-slate-100 truncate">Dr. John Doe</p>
+              <span className="text-[10px] px-1.5 py-0.5 bg-blue-600/20 text-blue-300 border border-blue-700/50 rounded font-medium inline-block">Admin</span>
             </div>
+            <UserCircle className="w-3.5 h-3.5 text-slate-500" />
           </div>
         </div>
       </aside>
 
       {/* Main Canvas Area */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        {/* White Header */}
-        <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-10 shrink-0 shadow-sm z-10">
+        {/* Header */}
+        <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
           <div>
-            <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{pageTitle}</h2>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Connected to main server</span>
+            <h2 className="text-base font-semibold text-slate-900">{pageTitle}</h2>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span className="text-xs font-medium text-slate-500">System active</span>
             </div>
           </div>
         </header>
 
-        {/* Scrollable Content Container (Light Gray Canvas) */}
-        <section className="flex-1 overflow-y-auto p-8 bg-[#F8FAFC]">
-          <div className="max-w-[1600px] mx-auto">
+        {/* Content Area */}
+        <section className="flex-1 overflow-y-auto p-5 bg-slate-100">
+          <div className="max-w-6xl mx-auto">
             {children}
           </div>
         </section>

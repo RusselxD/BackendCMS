@@ -1,25 +1,24 @@
 'use client'
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   CheckCircle2,
   XCircle,
   Clock,
   Archive,
-  Search,
-  MoreHorizontal,
   Eye,
-  MessageSquare,
   Calendar,
   User,
   AlertCircle,
   ChevronDown,
-  Filter,
+  Trash2,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { toast } from "sonner";
+import { usePathname, useSearchParams } from "next/navigation";
 
-type ArticleStatus = "pending" | "approved" | "archived";
+type ArticleStatus = "pending" | "approved" | "archive" | "deleted";
 
 interface Article {
   id: string;
@@ -32,7 +31,8 @@ interface Article {
   image_alt: string;
   created_at: string;
   approved_at?: string;
-  archived_at?: string;
+  archive_at?: string;
+  deleted_at?: string;
 }
 
 // Mock data - replace with real API calls
@@ -86,22 +86,30 @@ const ARTICLES_DATA: Article[] = [
 
 export default function ArticleApprovalsPage() {
   const [articles, setArticles] = useState<Article[]>(ARTICLES_DATA);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<ArticleStatus | "all">("pending");
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const selectedStatusParam = searchParams.get("status");
+  const selectedStatus: ArticleStatus =
+    selectedStatusParam === "approved" ||
+    selectedStatusParam === "archive" ||
+    selectedStatusParam === "deleted"
+      ? selectedStatusParam
+      : "pending";
   const [expandedArticle, setExpandedArticle] = useState<string | null>(null);
   const [reviewComment, setReviewComment] = useState("");
 
-  const filteredArticles = articles.filter((article) => {
-    const matchesSearch =
-      article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      article.author_name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === "all" || article.status === filterStatus;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredArticles = articles.filter((article) => article.status === selectedStatus);
 
   const pendingCount = articles.filter((a) => a.status === "pending").length;
   const approvedCount = articles.filter((a) => a.status === "approved").length;
-  const archivedCount = articles.filter((a) => a.status === "archived").length;
+  const archiveCount = articles.filter((a) => a.status === "archive").length;
+  const deletedCount = articles.filter((a) => a.status === "deleted").length;
+  const statusTabs: Array<{ key: ArticleStatus; label: string; count: number }> = [
+    { key: "pending", label: "Pending", count: pendingCount },
+    { key: "approved", label: "Approved", count: approvedCount },
+    { key: "archive", label: "Archive", count: archiveCount },
+    { key: "deleted", label: "Deleted", count: deletedCount },
+  ];
 
   const handleApprove = (id: string) => {
     setArticles((prev) =>
@@ -119,11 +127,23 @@ export default function ArticleApprovalsPage() {
     setArticles((prev) =>
       prev.map((article) =>
         article.id === id
-          ? { ...article, status: "archived", archived_at: new Date().toISOString() }
+          ? { ...article, status: "archive", archive_at: new Date().toISOString() }
           : article
       )
     );
     toast.error("Article archived");
+    setReviewComment("");
+  };
+
+  const handleDelete = (id: string) => {
+    setArticles((prev) =>
+      prev.map((article) =>
+        article.id === id
+          ? { ...article, status: "deleted", deleted_at: new Date().toISOString() }
+          : article
+      )
+    );
+    toast.error("Article deleted");
     setReviewComment("");
   };
 
@@ -142,19 +162,21 @@ export default function ArticleApprovalsPage() {
     const styles = {
       pending: "bg-amber-50 text-amber-700 border-amber-200",
       approved: "bg-green-50 text-green-700 border-green-200",
-      archived: "bg-slate-50 text-slate-700 border-slate-200",
+      archive: "bg-slate-50 text-slate-700 border-slate-200",
+      deleted: "bg-red-50 text-red-700 border-red-200",
     };
 
     const icons = {
       pending: Clock,
       approved: CheckCircle2,
-      archived: Archive,
+      archive: Archive,
+      deleted: Trash2,
     };
 
     const Icon = icons[status];
     return (
-      <div className={`flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-semibold ${styles[status]}`}>
-        <Icon className="w-3.5 h-3.5" />
+      <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-semibold ${styles[status]}`}>
+        <Icon className="w-3 h-3" />
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </div>
     );
@@ -162,98 +184,86 @@ export default function ArticleApprovalsPage() {
 
   return (
     <div className="w-full">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500 font-semibold mb-1">Pending Review</p>
-              <p className="text-3xl font-black text-amber-600">{pendingCount}</p>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
-              <Clock className="w-6 h-6 text-amber-600" />
-            </div>
+      {/* Compact Header */}
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 mb-5">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-sm md:text-base font-semibold text-slate-800">Article Approval Queue</h1>
+            <p className="text-xs text-slate-500 mt-0.5">School publication moderation panel</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
+              <Clock className="w-3.5 h-3.5" />
+              Pending: {pendingCount}
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-md border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              Approved: {approvedCount}
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700">
+              <Archive className="w-3.5 h-3.5" />
+              Archive: {archiveCount}
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700">
+              <Trash2 className="w-3.5 h-3.5" />
+              Deleted: {deletedCount}
+            </span>
           </div>
         </div>
-
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500 font-semibold mb-1">Approved</p>
-              <p className="text-3xl font-black text-green-600">{approvedCount}</p>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center">
-              <CheckCircle2 className="w-6 h-6 text-green-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500 font-semibold mb-1">Archived</p>
-              <p className="text-3xl font-black text-slate-600">{archivedCount}</p>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center">
-              <Archive className="w-6 h-6 text-slate-600" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Search and Filter */}
-      <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
-        <div className="flex gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search by title or author..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-            />
-          </div>
-          <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors">
-            <Filter className="w-5 h-5 text-gray-600" />
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as ArticleStatus | "all")}
-              className="bg-gray-50 text-sm font-semibold text-gray-900 outline-none cursor-pointer"
-            >
-              <option value="all">All Status</option>
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="archived">Archived</option>
-            </select>
+        <div className="mt-4 border-t border-gray-200 pt-3">
+          <div className="flex flex-wrap gap-2">
+            {statusTabs.map((tab) => (
+              <Link
+                key={tab.key}
+                href={`${pathname}?status=${tab.key}`}
+                className={clsx(
+                  "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors",
+                  selectedStatus === tab.key
+                    ? "border-slate-300 bg-slate-900 text-white"
+                    : "border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100"
+                )}
+              >
+                {tab.label}
+                <span
+                  className={clsx(
+                    "rounded px-1.5 py-0.5 text-[10px]",
+                    selectedStatus === tab.key ? "bg-white/20 text-white" : "bg-white text-gray-600"
+                  )}
+                >
+                  {tab.count}
+                </span>
+              </Link>
+            ))}
           </div>
         </div>
       </div>
 
       {/* Articles List */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {filteredArticles.length === 0 ? (
-          <div className="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-sm">
-            <AlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-600 font-semibold">No articles found</p>
-            <p className="text-sm text-gray-400 mt-1">Try adjusting your search or filter criteria</p>
+          <div className="bg-white rounded-lg p-10 text-center border border-gray-200 shadow-sm">
+            <AlertCircle className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-600 font-medium text-sm">No articles found</p>
+            <p className="text-xs text-gray-500 mt-1">
+              There are no items in this approval section.
+            </p>
           </div>
         ) : (
           filteredArticles.map((article) => (
             <div
               key={article.id}
-              className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
+              className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all overflow-hidden"
             >
               {/* Card Header */}
               <div
-                className="p-6 cursor-pointer hover:bg-gray-50 transition-colors"
+                className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
                 onClick={() =>
                   setExpandedArticle(expandedArticle === article.id ? null : article.id)
                 }
               >
-                <div className="flex items-start gap-6">
+                <div className="flex items-start gap-4">
                   {/* Thumbnail */}
-                  <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center flex-shrink-0 border border-gray-200 overflow-hidden">
+                  <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center flex-shrink-0 border border-gray-200 overflow-hidden">
                     <img
                       src={article.image_path}
                       alt={article.image_alt}
@@ -263,37 +273,37 @@ export default function ArticleApprovalsPage() {
                       }}
                     />
                     {!article.image_path && (
-                      <Eye className="w-8 h-8 text-blue-300" />
+                      <Eye className="w-6 h-6 text-blue-300" />
                     )}
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4 mb-3">
-                      <h3 className="text-lg font-black text-slate-900 leading-tight">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <h3 className="text-sm font-bold text-gray-900 leading-tight">
                         {article.title}
                       </h3>
                       <ChevronDown
                         className={clsx(
-                          "w-5 h-5 text-gray-400 flex-shrink-0 transition-transform",
+                          "w-4 h-4 text-gray-400 flex-shrink-0 transition-transform",
                           expandedArticle === article.id && "rotate-180"
                         )}
                       />
                     </div>
 
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+                    <p className="text-xs text-gray-600 line-clamp-2 mb-3">
                       {article.body}
                     </p>
 
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <div className="flex items-center gap-1.5">
-                          <User className="w-4 h-4" />
-                          <span className="font-semibold">{article.author_name}</span>
+                      <div className="flex items-center gap-3 text-xs text-gray-500">
+                        <div className="flex items-center gap-1">
+                          <User className="w-3.5 h-3.5" />
+                          <span className="font-medium">{article.author_name}</span>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-4 h-4" />
-                          <span>{formatDate(article.created_at)}</span>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span className="text-[10px]">{formatDate(article.created_at)}</span>
                         </div>
                       </div>
                       {getStatusBadge(article.status)}
@@ -304,67 +314,86 @@ export default function ArticleApprovalsPage() {
 
               {/* Expanded Details */}
               {expandedArticle === article.id && (
-                <div className="border-t border-gray-100 p-6 bg-gray-50">
-                  <div className="mb-6">
-                    <h4 className="text-sm font-black text-gray-700 mb-3 uppercase tracking-wider">
+                <div className="border-t border-gray-100 p-4 bg-gray-50">
+                  <div className="mb-4">
+                    <h4 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
                       Full Content
                     </h4>
                     <p className="text-sm text-gray-700 leading-relaxed">{article.body}</p>
                   </div>
 
-                  <div className="mb-6">
-                    <h4 className="text-sm font-black text-gray-700 mb-3 uppercase tracking-wider">
+                  <div className="mb-4">
+                    <h4 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
                       Review Notes
                     </h4>
                     <textarea
                       value={reviewComment}
                       onChange={(e) => setReviewComment(e.target.value)}
-                      placeholder="Add your review comments here (optional)..."
-                      className="w-full p-4 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                      rows={3}
+                      placeholder="Add your review notes (optional)..."
+                      className="w-full p-3 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                      rows={2}
                     />
                   </div>
 
                   {/* Action Buttons */}
                   {article.status === "pending" && (
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleApprove(article.id)}
-                        className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-xl font-bold text-sm hover:bg-green-700 transition-colors active:scale-95"
+                        className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 bg-green-600 text-white rounded-lg font-medium text-xs hover:bg-green-700 transition-colors"
                       >
-                        <CheckCircle2 className="w-5 h-5" />
-                        Approve Article
+                        <CheckCircle2 className="w-4 h-4" />
+                        Approve
                       </button>
                       <button
                         onClick={() => handleReject(article.id)}
-                        className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-white rounded-xl font-bold text-sm hover:bg-red-700 transition-colors active:scale-95"
+                        className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 bg-red-600 text-white rounded-lg font-medium text-xs hover:bg-red-700 transition-colors"
                       >
-                        <XCircle className="w-5 h-5" />
-                        Reject & Archive
+                        <XCircle className="w-4 h-4" />
+                        Reject
                       </button>
                     </div>
                   )}
 
                   {article.status === "approved" && (
-                    <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
-                      <div className="flex items-center gap-2 text-green-700 text-sm font-semibold mb-1">
-                        <CheckCircle2 className="w-4 h-4" />
+                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="flex items-center gap-1.5 text-green-700 text-xs font-semibold mb-0.5">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
                         Approved
                       </div>
                       <p className="text-xs text-green-600">
-                        Approved on {formatDate(article.approved_at!)}
+                        {formatDate(article.approved_at!)}
                       </p>
                     </div>
                   )}
 
-                  {article.status === "archived" && (
-                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                      <div className="flex items-center gap-2 text-slate-700 text-sm font-semibold mb-1">
-                        <Archive className="w-4 h-4" />
+                  {article.status === "archive" && (
+                    <div className="p-3 bg-gray-100 border border-gray-300 rounded-lg">
+                      <div className="flex items-center gap-1.5 text-gray-700 text-xs font-semibold mb-0.5">
+                        <Archive className="w-3.5 h-3.5" />
                         Archived
                       </div>
-                      <p className="text-xs text-slate-600">
-                        Archived on {formatDate(article.archived_at!)}
+                      <p className="text-xs text-gray-600">
+                        {formatDate(article.archive_at!)}
+                      </p>
+                      <button
+                        onClick={() => handleDelete(article.id)}
+                        className="mt-3 w-full flex items-center justify-center gap-1.5 px-4 py-2 bg-red-600 text-white rounded-lg font-medium text-xs hover:bg-red-700 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </button>
+                    </div>
+                  )}
+
+                  {article.status === "deleted" && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="flex items-center gap-1.5 text-red-700 text-xs font-semibold mb-0.5">
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Deleted
+                      </div>
+                      <p className="text-xs text-red-600">
+                        {article.deleted_at ? formatDate(article.deleted_at) : "Recently deleted"}
                       </p>
                     </div>
                   )}

@@ -1,7 +1,8 @@
 'use client'
 
-import { AcademicPrograms } from "../pages/AcademicPrograms";
+import { CurriculumSettings } from "../pages/CurriculumSettings";
 
 export default function ProgramsPage() {
-  return <AcademicPrograms />;
+  return <CurriculumSettings />;
 }
+

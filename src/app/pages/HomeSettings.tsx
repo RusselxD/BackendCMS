@@ -1,0 +1,311 @@
+'use client'
+
+import React, { useState } from "react";
+import { Save, Plus, Trash2, Upload } from "lucide-react";
+import { toast } from "sonner";
+
+interface Service {
+  id: string;
+  title: string;
+}
+
+interface HomeContent {
+  collegeSection: {
+    title: string;
+    description: string;
+  };
+  deanSection: {
+    name: string;
+    photoUrl: string;
+    description: string;
+  };
+  registrarSection: {
+    title: string;
+    description: string;
+    phone: string;
+    email: string;
+    location: string;
+    hours: string;
+    services: Service[];
+  };
+}
+
+const INITIAL_DATA: HomeContent = {
+  collegeSection: {
+    title: "College of Engineering and Information Technology",
+    description: "Our college offers Civil Engineering, Electrical Engineering, and Information Technology programs. Each program is supported by a dedicated student organization."
+  },
+  deanSection: {
+    name: "Engr. Jordan Velasco",
+    photoUrl: "/images/dean.jpg",
+    description: "Under his guidance, the College continues to uphold its mission of producing future-ready engineers and IT professionals who are equipped to meet the evolving demands of society and industry."
+  },
+  registrarSection: {
+    title: "Registrar's Office",
+    description: "The Registrar's Office maintains academic records, coordinates course registration, and ensures the integrity of academic policies and procedures.",
+    phone: "+63 (32) 7000 loc. 125",
+    email: "registrar.office_un@yahoo.com",
+    location: "Maysan Road corner Tongco Street, Maysan, Valenzuela City",
+    hours: "Monday-Friday, 8:00 AM - 5:00 PM",
+    services: [
+      { id: "1", title: "Course Registration & Add/Drop" },
+      { id: "2", title: "Transcript Requests" },
+      { id: "3", title: "Degree Verification" },
+      { id: "4", title: "Graduation Processing" }
+    ]
+  }
+};
+
+export function HomeSettings() {
+  const [data, setData] = useState<HomeContent>(INITIAL_DATA);
+  const [newService, setNewService] = useState("");
+
+  const handleCollegeSectionChange = (field: string, value: string) => {
+    setData(prev => ({
+      ...prev,
+      collegeSection: {
+        ...prev.collegeSection,
+        [field]: value
+      }
+    }));
+  };
+
+  const handleDeanSectionChange = (field: string, value: string) => {
+    setData(prev => ({
+      ...prev,
+      deanSection: {
+        ...prev.deanSection,
+        [field]: value
+      }
+    }));
+  };
+
+  const handleRegistrarChange = (field: string, value: string) => {
+    setData(prev => ({
+      ...prev,
+      registrarSection: {
+        ...prev.registrarSection,
+        [field]: value
+      }
+    }));
+  };
+
+  const addService = () => {
+    if (!newService.trim()) return;
+    setData(prev => ({
+      ...prev,
+      registrarSection: {
+        ...prev.registrarSection,
+        services: [
+          ...prev.registrarSection.services,
+          { id: Date.now().toString(), title: newService }
+        ]
+      }
+    }));
+    setNewService("");
+  };
+
+  const removeService = (id: string) => {
+    setData(prev => ({
+      ...prev,
+      registrarSection: {
+        ...prev.registrarSection,
+        services: prev.registrarSection.services.filter(s => s.id !== id)
+      }
+    }));
+  };
+
+  const handleSave = () => {
+    localStorage.setItem('homeContent', JSON.stringify(data));
+    toast.success("Home page content updated successfully!");
+  };
+
+  return (
+    <div className="space-y-5">
+      {/* College Intro Section */}
+      <div className="bg-white border border-gray-400 p-5">
+        <h2 className="text-base font-bold text-slate-900 mb-4 uppercase tracking-wide">College Intro Section</h2>
+        
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs font-bold text-slate-900 mb-2 uppercase">Section Title</label>
+            <input
+              type="text"
+              value={data.collegeSection.title}
+              onChange={(e) => handleCollegeSectionChange('title', e.target.value)}
+              className="w-full px-3 py-2 bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-900 mb-2 uppercase">Description</label>
+            <textarea
+              value={data.collegeSection.description}
+              onChange={(e) => handleCollegeSectionChange('description', e.target.value)}
+              className="w-full px-3 py-2 bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none h-20"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-900 mb-2 uppercase">Organization Logos</label>
+            <div className="border-2 border-dashed border-gray-400 p-5 text-center hover:border-gray-600 transition-colors cursor-pointer">
+              <Upload className="w-6 h-6 text-gray-500 mx-auto mb-2" />
+              <p className="text-xs text-gray-600 font-medium">Click to upload logos image</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Meet the Dean Section */}
+      <div className="bg-white border border-gray-400 p-5">
+        <h2 className="text-base font-bold text-slate-900 mb-4 uppercase tracking-wide">Meet the Dean</h2>
+        
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold text-slate-900 mb-2 uppercase">Dean Name</label>
+              <input
+                type="text"
+                value={data.deanSection.name}
+                onChange={(e) => handleDeanSectionChange('name', e.target.value)}
+                className="w-full px-3 py-2 bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-900 mb-2 uppercase">Dean Photo</label>
+              <div className="border-2 border-dashed border-gray-400 p-3 text-center hover:border-gray-600 transition-colors cursor-pointer">
+                <Upload className="w-4 h-4 text-gray-500 mx-auto" />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-900 mb-2 uppercase">Description</label>
+            <textarea
+              value={data.deanSection.description}
+              onChange={(e) => handleDeanSectionChange('description', e.target.value)}
+              className="w-full px-3 py-2 bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none h-20"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Registrar Section */}
+      <div className="bg-white border border-gray-400 p-5">
+        <h2 className="text-base font-bold text-slate-900 mb-4 uppercase tracking-wide">Registrar's Office</h2>
+        
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs font-bold text-slate-900 mb-2 uppercase">Office Title</label>
+            <input
+              type="text"
+              value={data.registrarSection.title}
+              onChange={(e) => handleRegistrarChange('title', e.target.value)}
+              className="w-full px-3 py-2 bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-900 mb-2 uppercase">Description</label>
+            <textarea
+              value={data.registrarSection.description}
+              onChange={(e) => handleRegistrarChange('description', e.target.value)}
+              className="w-full px-3 py-2 bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none h-16"
+            />
+          </div>
+
+          {/* Contact Info */}
+          <div className="border-t border-gray-300 pt-3">
+            <h3 className="text-xs font-bold text-slate-900 mb-3 uppercase">Contact Information</h3>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs font-bold text-slate-900 mb-1 uppercase">Phone</label>
+                <input
+                  type="text"
+                  value={data.registrarSection.phone}
+                  onChange={(e) => handleRegistrarChange('phone', e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-900 mb-1 uppercase">Email</label>
+                <input
+                  type="text"
+                  value={data.registrarSection.email}
+                  onChange={(e) => handleRegistrarChange('email', e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900"
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="block text-xs font-bold text-slate-900 mb-1 uppercase">Location</label>
+                <input
+                  type="text"
+                  value={data.registrarSection.location}
+                  onChange={(e) => handleRegistrarChange('location', e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900"
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="block text-xs font-bold text-slate-900 mb-1 uppercase">Office Hours</label>
+                <input
+                  type="text"
+                  value={data.registrarSection.hours}
+                  onChange={(e) => handleRegistrarChange('hours', e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Services List */}
+          <div className="border-t border-gray-300 pt-3">
+            <h3 className="text-xs font-bold text-slate-900 mb-3 uppercase">Services</h3>
+            <div className="space-y-2 mb-2">
+              {data.registrarSection.services.map((service) => (
+                <div key={service.id} className="flex items-center justify-between bg-gray-100 p-2 border border-gray-300">
+                  <span className="text-xs text-slate-900 font-medium">{service.title}</span>
+                  <button
+                    onClick={() => removeService(service.id)}
+                    className="px-3 py-1 bg-orange-600 text-white rounded text-xs font-bold hover:bg-orange-700"
+                  >
+                    ARCHIVE
+                  </button>
+                </div>
+              ))}
+            </div>
+            
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Add new service..."
+                value={newService}
+                onChange={(e) => setNewService(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && addService()}
+                className="flex-1 px-3 py-2 bg-white border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900"
+              />
+              <button
+                onClick={addService}
+                className="flex items-center gap-1.5 px-3 py-2 bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 uppercase"
+              >
+                <Plus className="w-4 h-4" />
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Save Button */}
+      <div className="flex justify-end">
+        <button
+          onClick={handleSave}
+          className="flex items-center gap-2 px-5 py-2 bg-slate-900 text-white font-bold hover:bg-slate-800 transition-colors text-xs uppercase"
+        >
+          <Save className="w-4 h-4" />
+          Save Home Content
+        </button>
+      </div>
+    </div>
+  );
+}

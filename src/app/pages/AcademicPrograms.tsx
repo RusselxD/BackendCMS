@@ -53,113 +53,112 @@ export function AcademicPrograms() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
       {/* Program Selection Sidebar */}
-      <div className="lg:col-span-3 space-y-4">
-        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Engineering Departments</label>
+      <div className="lg:col-span-3 space-y-3">
+        <label className="block text-xs font-semibold text-gray-600 uppercase tracking-tight mb-3">Engineering Departments</label>
         <div className="space-y-2">
           {PROGRAMS.map((p) => (
             <button
               key={p.id}
               onClick={() => setSelectedId(p.id)}
               className={clsx(
-                "w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left group",
+                "w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left group",
                 selectedId === p.id 
-                  ? "border-blue-600 bg-white shadow-md ring-4 ring-blue-50" 
-                  : "border-transparent bg-white/50 text-gray-500 hover:bg-white hover:border-gray-200"
+                  ? "border-blue-500 bg-white shadow-sm ring-2 ring-blue-100" 
+                  : "border-gray-100 bg-white text-gray-500 hover:bg-gray-50 hover:border-gray-200"
               )}
             >
-              <div className={clsx("w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg", p.color)}>
-                <p.icon className="w-6 h-6" />
+              <div className={clsx("w-10 h-10 rounded-lg flex items-center justify-center text-white shadow", p.color)}>
+                <p.icon className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <span className={clsx("text-sm font-bold block", selectedId === p.id ? "text-gray-900" : "text-gray-600")}>
-                  {p.id} Department
+                <span className={clsx("text-sm font-semibold block", selectedId === p.id ? "text-gray-900" : "text-gray-600")}>
+                  {p.id}
                 </span>
-                <span className="text-[10px] uppercase font-bold text-gray-400 tracking-tight">
-                  {p.stats.students} Students
+                <span className="text-xs font-medium text-gray-500">
+                  {p.stats.students} students
                 </span>
               </div>
-              <ChevronRight className={clsx("w-4 h-4 transition-transform", selectedId === p.id ? "text-blue-600 translate-x-1" : "text-gray-300")} />
+              <ChevronRight className={clsx("w-4 h-4 transition-transform flex-shrink-0", selectedId === p.id ? "text-blue-500 translate-x-0.5" : "text-gray-300")} />
             </button>
           ))}
         </div>
 
-        <div className="mt-8 p-6 bg-blue-50 rounded-2xl border border-blue-100">
-          <h4 className="text-sm font-bold text-blue-900 flex items-center gap-2 mb-2">
-            <CheckCircle className="w-4 h-4" />
-            Admin Quick Tip
+        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+          <h4 className="text-xs font-semibold text-blue-900 flex items-center gap-2 mb-1.5">
+            <CheckCircle className="w-3.5 h-3.5" />
+            Admin Tip
           </h4>
-          <p className="text-xs text-blue-700 font-medium leading-relaxed">
-            Updating the description here will immediately change the program overview cards on the public "Programs" page.
+          <p className="text-xs text-blue-700 leading-relaxed">
+            Changes here update the public Programs page.
           </p>
         </div>
       </div>
 
       {/* Program Editor Area */}
       <div className="lg:col-span-9">
-        <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm flex flex-col h-full">
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm flex flex-col h-full">
           {/* Editor Header */}
-          <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-gray-50/30">
-            <div className="flex items-center gap-4">
-              <div className={clsx("w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-xl", selectedProgram.color, selectedProgram.shadowColor)}>
-                <selectedProgram.icon className="w-8 h-8" />
+          <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+            <div className="flex items-center gap-3">
+              <div className={clsx("w-12 h-12 rounded-lg flex items-center justify-center text-white shadow", selectedProgram.color)}>
+                <selectedProgram.icon className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tight">{selectedProgram.name}</h3>
-                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                  Active Program Dashboard
+                <h3 className="text-lg font-bold text-gray-900">{selectedProgram.name}</h3>
+                <p className="text-xs text-gray-500 font-medium flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                  Active
                 </p>
               </div>
             </div>
-            <div className="flex gap-3">
-              <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors">
-                <ExternalLink className="w-4 h-4" />
-                View Page
+            <div className="flex gap-2">
+              <button className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+                <ExternalLink className="w-3.5 h-3.5" />
+                View
               </button>
               <button 
                 onClick={handleUpdate}
-                className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20"
+                className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition-all shadow"
               >
-                <Save className="w-4 h-4" />
-                Update Program
+                <Save className="w-3.5 h-3.5" />
+                Update
               </button>
             </div>
           </div>
 
           {/* Editor Body */}
-          <div className="flex-1 p-8 space-y-8 overflow-y-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100 text-center group hover:bg-white hover:shadow-md transition-all">
-                <span className="text-3xl font-black text-gray-900 block mb-1">{selectedProgram.stats.students}</span>
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Students</span>
+          <div className="flex-1 p-6 space-y-5 overflow-y-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 text-center hover:bg-white hover:shadow-sm transition-all">
+                <span className="text-2xl font-bold text-gray-900 block">{selectedProgram.stats.students}</span>
+                <span className="text-xs font-medium text-gray-500">Students</span>
               </div>
-              <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100 text-center group hover:bg-white hover:shadow-md transition-all">
-                <span className="text-3xl font-black text-gray-900 block mb-1">{selectedProgram.stats.faculty}</span>
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Faculty</span>
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 text-center hover:bg-white hover:shadow-sm transition-all">
+                <span className="text-2xl font-bold text-gray-900 block">{selectedProgram.stats.faculty}</span>
+                <span className="text-xs font-medium text-gray-500">Faculty</span>
               </div>
-              <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100 text-center group hover:bg-white hover:shadow-md transition-all">
-                <span className="text-3xl font-black text-gray-900 block mb-1">{selectedProgram.stats.labs}</span>
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Labs</span>
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 text-center hover:bg-white hover:shadow-sm transition-all">
+                <span className="text-2xl font-bold text-gray-900 block">{selectedProgram.stats.labs}</span>
+                <span className="text-xs font-medium text-gray-500">Labs</span>
               </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="space-y-2">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-blue-500" />
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-gray-900 flex items-center gap-2">
+                    <FileText className="w-3.5 h-3.5 text-blue-500" />
                     Program Description
                   </label>
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Character Limit: 500</span>
+                  <span className="text-xs font-medium text-gray-400">Max 500 characters</span>
                 </div>
                 <textarea 
-                  className="w-full h-40 bg-gray-50 border border-gray-200 rounded-2xl p-6 text-base font-medium text-gray-700 outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none shadow-inner"
+                  className="w-full h-32 bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm font-medium text-gray-700 outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none"
                   defaultValue={selectedProgram.description}
                 ></textarea>
               </div>
-
             </div>
           </div>
         </div>
