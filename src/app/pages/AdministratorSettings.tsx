@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Plus, Edit2, Users, Building2, Loader2, Save } from "lucide-react";
+import { Plus, Edit2, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import { apiFetch } from "../lib/api";
 
@@ -13,25 +13,12 @@ interface BoardMember {
 }
 
 interface AdminContent {
-  boardOfRegents: {
-    members: BoardMember[];
-  };
   organizationalChart: {
     members: BoardMember[];
   };
 }
 
 const INITIAL_DATA: AdminContent = {
-  boardOfRegents: {
-    members: [
-      { id: "1", name: "CITY MAYOR WESLIE T. GATCHALIAN", position: "CHAIRMAN", photo: "" },
-      { id: "2", name: "ATTY. DANILO L. CONCEPCION", position: "VICE-CHAIRMAN", photo: "" },
-      { id: "3", name: "DR. NEDEÑA C. TORRALBA", position: "PLV PRESIDENT", photo: "" },
-      { id: "4", name: "REGENT LORENA C. NATIVIDAD-BORJA", position: "MEMBER", photo: "" },
-      { id: "5", name: "REGENT FLORO P. ALEJO", position: "MEMBER", photo: "" },
-      { id: "6", name: "REGENT WILFRODO E. CARBAL", position: "MEMBER", photo: "" }
-    ]
-  },
   organizationalChart: {
     members: [
       { id: "1", name: "Dr. Nedeña C. Torralba", position: "University President", photo: "" },
@@ -47,7 +34,6 @@ const INITIAL_DATA: AdminContent = {
 
 export function AdministratorSettings() {
   const [data, setData] = useState<AdminContent>(INITIAL_DATA);
-  const [activeTab, setActiveTab] = useState<'board' | 'org'>('board');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<BoardMember | null>(null);
   const [loading, setLoading] = useState(true);
@@ -56,7 +42,7 @@ export function AdministratorSettings() {
   const fetchContent = useCallback(async () => {
     try {
       const res = await apiFetch<{ content: AdminContent }>("/site-content/administration");
-      setData(res.content);
+      setData({ organizationalChart: res.content.organizationalChart ?? INITIAL_DATA.organizationalChart });
     } catch {
       // No saved content yet — use defaults
     } finally {
@@ -81,22 +67,18 @@ export function AdministratorSettings() {
     }
   };
 
-  const addMember = (tab: 'board' | 'org') => {
+  const addMember = () => {
     const newMember: BoardMember = { id: Date.now().toString(), name: "New Member", position: "Position", photo: "" };
     setData(prev => ({
       ...prev,
-      [tab === 'board' ? 'boardOfRegents' : 'organizationalChart']: {
-        members: [...prev[tab === 'board' ? 'boardOfRegents' : 'organizationalChart'].members, newMember]
-      }
+      organizationalChart: { members: [...prev.organizationalChart.members, newMember] }
     }));
   };
 
-  const removeMember = (tab: 'board' | 'org', id: string) => {
+  const removeMember = (id: string) => {
     setData(prev => ({
       ...prev,
-      [tab === 'board' ? 'boardOfRegents' : 'organizationalChart']: {
-        members: prev[tab === 'board' ? 'boardOfRegents' : 'organizationalChart'].members.filter(m => m.id !== id)
-      }
+      organizationalChart: { members: prev.organizationalChart.members.filter(m => m.id !== id) }
     }));
     toast.success("Member removed!");
   };
@@ -110,10 +92,8 @@ export function AdministratorSettings() {
     if (!editForm) return;
     setData(prev => ({
       ...prev,
-      [activeTab === 'board' ? 'boardOfRegents' : 'organizationalChart']: {
-        members: prev[activeTab === 'board' ? 'boardOfRegents' : 'organizationalChart'].members.map(m =>
-          m.id === editForm.id ? editForm : m
-        )
+      organizationalChart: {
+        members: prev.organizationalChart.members.map(m => m.id === editForm.id ? editForm : m)
       }
     }));
     setEditingId(null);
@@ -121,7 +101,7 @@ export function AdministratorSettings() {
     toast.success("Member updated!");
   };
 
-  const currentMembers = activeTab === 'board' ? data.boardOfRegents.members : data.organizationalChart.members;
+  const currentMembers = data.organizationalChart.members;
   const memberCount = currentMembers.length;
 
   if (loading) {
@@ -130,21 +110,12 @@ export function AdministratorSettings() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-3 pb-1">
-        <button onClick={() => setActiveTab('board')} className={`ceit-subtab ${activeTab === 'board' ? 'ceit-subtab-active' : 'ceit-subtab-inactive'}`}>
-          <Users className="w-4 h-4" /> Board of Regents
-        </button>
-        <button onClick={() => setActiveTab('org')} className={`ceit-subtab ${activeTab === 'org' ? 'ceit-subtab-active' : 'ceit-subtab-inactive'}`}>
-          <Building2 className="w-4 h-4" /> Organizational Chart
-        </button>
-      </div>
-
       <div className="flex items-center justify-between pt-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900">{activeTab === 'board' ? 'Board of Regents' : 'Organizational Chart'}</h2>
+          <h2 className="text-xl font-bold text-slate-900">Organizational Chart</h2>
           <p className="text-xs text-gray-600 mt-1">{memberCount} {memberCount === 1 ? 'member' : 'members'}</p>
         </div>
-        <button onClick={() => addMember(activeTab)} className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded text-xs font-bold hover:bg-slate-800 transition-colors">
+        <button onClick={addMember} className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded text-xs font-bold hover:bg-slate-800 transition-colors">
           <Plus className="w-4 h-4" /> ADD MEMBER
         </button>
       </div>
@@ -175,7 +146,7 @@ export function AdministratorSettings() {
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => startEdit(member)} className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"><Edit2 className="w-4 h-4" /></button>
-                  <button onClick={() => removeMember(activeTab, member.id)} className="p-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-xs font-bold" title="Remove">REMOVE</button>
+                  <button onClick={() => removeMember(member.id)} className="p-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-xs font-bold" title="Remove">REMOVE</button>
                 </div>
               </div>
             )}
